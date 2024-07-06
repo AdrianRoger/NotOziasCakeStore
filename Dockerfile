@@ -1,32 +1,30 @@
-# Etapa de build
+# Build stage
 FROM node:18-alpine AS build
-# Defina o diretório de trabalho dentro do contêiner
+# Set working directory inside the container
 WORKDIR /app
-# Copie os arquivos package.json e package-lock.json
+# Copy package.json and package-lock.json files
 COPY package*.json ./
-# Instale todas as dependências (incluindo as de desenvolvimento)
+# Install all dependencies (including development)
 RUN npm ci
-# Copie o restante do código do aplicativo
+# Copy the rest of the application code
 COPY . .
-# Crie o build do aplicativo React
+# Build the React application
 RUN npm run build
-# Etapa final
+# Production stage
 FROM node:18-alpine AS prod
-# Defina o diretório de trabalho dentro do contêiner
+# Set working directory inside the container
 WORKDIR /app
-# Copie apenas os arquivos package.json e package-lock.json para a imagem final
+# Copy only package.json and package-lock.json files to the final image
 COPY package*.json ./
-# Instale apenas as dependências de produção
+# Install only production dependencies
 RUN npm ci --only=production
-# Copie o build gerado na etapa anterior
+# Copy the build generated from the previous stage
 COPY --from=build /app/build /app/build
-# Use uma imagem base do Nginx para servir o build estático
+# Use a base Nginx image to serve the static build
 FROM nginx:stable-alpine
-# Copie o build da etapa anterior para a pasta de distribuição do Nginx
+# Copy the build from the previous stage to the Nginx distribution folder
 COPY --from=build /app/build /usr/share/nginx/html
-
-# Exponha a porta que o Nginx irá usar
+# Expose the port that Nginx will use
 EXPOSE 80
-
-# Inicie o servidor Nginx
+# Start the Nginx server
 CMD ["nginx", "-g", "daemon off;"]
