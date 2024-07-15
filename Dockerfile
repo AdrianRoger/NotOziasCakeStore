@@ -24,6 +24,8 @@ COPY --from=build /app/build /app/build
 FROM nginx:stable-alpine
 # Copy the build from the previous stage to the Nginx distribution folder
 COPY --from=build /app/build /usr/share/nginx/html
+# Copy nginx conf to container
+COPY nginx.conf /etc/nginx/nginx.conf
 # Expose the port that Nginx will use
 EXPOSE 80
 # Start the Nginx server
