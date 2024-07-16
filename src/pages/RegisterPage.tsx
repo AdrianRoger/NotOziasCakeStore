@@ -93,7 +93,15 @@ const RegisterPage: React.FC<RegisterProps> = ({ setIsAuthenticated }) => {
     const createdUser = createNewUser(newUser);
 
     if (createdUser !== null) {
-      navigate("/login");
+      localStorage.setItem(
+        "isAuthenticated",
+        JSON.stringify({
+          index: userList.length,
+          username: createdUser.username,
+        })
+      );
+      navigate("/");
+      setIsAuthenticated(true);
     }
   };
 

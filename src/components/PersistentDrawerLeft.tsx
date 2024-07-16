@@ -114,7 +114,7 @@ export default function PersistentDrawerLeft({
     localStorage.removeItem("isAuthenticated");
   };
 
-  React.useMemo(() => { //Only onMount
+  React.useEffect(() => { //Only onMount
     checkAuthentication();
   },[]);
 
