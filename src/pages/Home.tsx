@@ -12,19 +12,22 @@ import { ProductsContext } from "../context/ProductsContext";
 import { IItem } from "../interfaces/interfaces";
 import { UserContext } from "../context/UserContext";
 
-
 const Home = () => {
   const productsContext = useContext(ProductsContext);
   const userContext = useContext(UserContext);
   const { products } = productsContext;
   const [filteredProducts, setFilteredProducts] = useState<IItem[]>([]);
 
-  useEffect(()=>{
-    const maxPrice = products.reduce((max, item) => item.price > max.price ? item : max , products[0])
-    const filtered = products.filter((product) => product.price <= maxPrice.price * 0.35);
-    setFilteredProducts(filtered)
-  }, [products])
-  
+  useEffect(() => {
+    const maxPrice = products.reduce(
+      (max, item) => (item.price > max.price ? item : max),
+      products[0]
+    );
+    const filtered = products.filter(
+      (product) => product.price <= maxPrice.price * 0.35
+    );
+    setFilteredProducts(filtered);
+  }, [products]);
 
   const { addToCart } = userContext;
 
@@ -34,13 +37,15 @@ const Home = () => {
         Welcome {userContext.loggedUser.name || "Unknown"}
       </Typography>
       <Typography variant="h6" component="h6" gutterBottom>
-      Discover our promotions
+        Discover our promotions
       </Typography>
       <Grid container spacing={4}>
         {filteredProducts.map((product) => (
           <Grid item key={product.id} xs={12} sm={6} md={4}>
-            <Card>
-              <CardContent>
+            <Card
+              sx={{ height: "100%", display: "flex", flexDirection: "column" }}
+            >
+              <CardContent sx={{ flex: 1 }}>
                 <Typography
                   variant="h6"
                   component="h6"

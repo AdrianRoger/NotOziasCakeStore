@@ -21,13 +21,15 @@ const ProductsPage: React.FC = () => {
 
   const { addToCart } = userContext;
 
-  const handleSearch = useCallback((query: string) => {
-    const filtered = products.filter(
-      (product) =>
-        product.name.toLowerCase().includes(query.toLowerCase()) 
-    );
-    setFilteredProducts(filtered);
-  }, [products]);
+  const handleSearch = useCallback(
+    (query: string) => {
+      const filtered = products.filter((product) =>
+        product.name.toLowerCase().includes(query.toLowerCase())
+      );
+      setFilteredProducts(filtered);
+    },
+    [products]
+  );
 
   return (
     <>
@@ -38,8 +40,10 @@ const ProductsPage: React.FC = () => {
       <Grid container spacing={4}>
         {filteredProducts.map((product) => (
           <Grid item key={product.id} xs={12} sm={6} md={4}>
-            <Card>
-              <CardContent>
+            <Card
+              sx={{ height: "100%", display: "flex", flexDirection: "column" }}
+            >
+              <CardContent sx={{ flex: 1 }}>
                 <Typography
                   variant="h6"
                   component="h6"
