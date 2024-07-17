@@ -24,8 +24,7 @@ const AddBalanceForm: React.FC<AddBalanceFormProps> = ({ handleClose }) => {
         type="number"
         fullWidth
         margin="normal"
-        value={amount}
-        onChange={(e) => setAmount(parseFloat(e.target.value))}
+        onChange={(e) => setAmount(isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value))}
       />
       <Button variant="contained" color="secondary" onClick={handleAddBalance}>
         Add Money
