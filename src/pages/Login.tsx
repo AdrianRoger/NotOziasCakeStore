@@ -125,12 +125,22 @@ const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
           </Button>
           <Grid container>
             <Grid item xs>
-              <Link href="#" variant="body2">
+              <Link
+                href="#"
+                onClick={(e) => e.preventDefault()}
+                variant="body2"
+              >
                 Forgot password?
               </Link>
             </Grid>
             <Grid item>
-              <Link href="/register" variant="body2">
+              <Link href="/register"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate("/register");
+                }}
+                variant="body2"
+              >
                 {"Don't have an account? Sign Up"}
               </Link>
             </Grid>

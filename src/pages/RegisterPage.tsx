@@ -210,7 +210,12 @@ const RegisterPage: React.FC<RegisterProps> = ({ setIsAuthenticated }) => {
           </Box>
           <Grid container justifyContent="flex-end">
             <Grid item>
-              <Link href="/login" variant="body2">
+              <Link href="/login" 
+              onClick={(e) => {
+                e.preventDefault()
+                navigate("/login");
+              }}
+              variant="body2">
                 Already have an account? Sign in
               </Link>
             </Grid>
