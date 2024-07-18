@@ -88,7 +88,7 @@ export default function PersistentDrawerLeft({
   children,
 }: IPersistentDrawerLeftProps) {
   const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(true);
   const userContext = React.useContext(UserContext);
   const { setLoggedUser } = userContext;
 
