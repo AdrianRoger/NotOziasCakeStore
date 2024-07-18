@@ -27,3 +27,7 @@ export interface IStorage {
   key: string;
   value: any;
 }
+
+export interface GCart extends IItem {
+  quantity: number;
+}

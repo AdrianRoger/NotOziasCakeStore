@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useMemo } from "react";
 import {
   Typography,
   Button,
@@ -12,6 +12,7 @@ import { UserContext } from "../context/UserContext";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Modal from "../components/Modal";
 import { useNavigate } from "react-router-dom";
+import { GCart, IItem } from "../interfaces/interfaces";
 
 const CartPage: React.FC = () => {
   const userContext = useContext(UserContext);
@@ -21,7 +22,22 @@ const CartPage: React.FC = () => {
 
   const { balance, toDebit, cart, removeFromCart, clearCart } = userContext;
 
-  const totalPrice = cart.reduce((acc, item) => acc + item.price, 0);
+  const totalPrice = useMemo(() => {
+    return cart.reduce((acc, item) => acc + item.price, 0);
+  }, [cart]);
+
+  const groupedCart = useMemo(() => {
+    const grouped: GCart[] = cart.reduce((acc: GCart[], item: IItem) => {
+      const foundItem = acc.find((i) => i.id === item.id);
+      if (foundItem) {
+        foundItem.quantity += 1;
+      } else {
+        acc.push({ ...item, quantity: 1 });
+      }
+      return acc;
+    }, []);
+    return grouped;
+  }, [cart]);
 
   const purchase = (amount: number) => {
     if (!toDebit(amount)) {
@@ -45,6 +61,13 @@ const CartPage: React.FC = () => {
     setSuccessPurchase(false);
   };
 
+  const handleRemove = (itemId: number) => {
+    const itemIndex = cart.findIndex(item => item.id === itemId);
+    if (itemIndex !== -1) {
+      removeFromCart(itemIndex);
+    }
+  };
+
   const keepBuying = () => {
     navigate("/products");
   };
@@ -60,17 +83,19 @@ const CartPage: React.FC = () => {
       {cart.length > 0 ? (
         <>
           <List>
-            {cart.map((item, index) => (
+            {groupedCart.map((item, index) => (
               <ListItem key={index}>
                 <ListItemText
-                  primary={item.name}
-                  secondary={`$ ${item.price.toFixed(2)}`}
+                  primary={`${item.name} x ${item.quantity}`}
+                  secondary={`$ ${item.price.toFixed(2)} each, total: $ ${(
+                    item.price * item.quantity
+                  ).toFixed(2)}`}
                 />
                 <ListItemSecondaryAction>
                   <IconButton
                     edge="end"
                     aria-label="delete"
-                    onClick={() => removeFromCart(index)}
+                    onClick={() => handleRemove(item.id)}
                   >
                     <DeleteIcon />
                   </IconButton>
