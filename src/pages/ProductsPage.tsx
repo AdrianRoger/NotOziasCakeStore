@@ -1,35 +1,62 @@
-import React, { useCallback, useContext, useState } from "react";
 import {
-  Grid,
-  Card,
-  CardContent,
-  CardActions,
-  Button,
-  Typography,
-  Divider,
-} from "@mui/material";
+  FC,
+  useCallback,
+  useContext,
+  useState,
+  useTransition,
+  useEffect,
+} from "react";
 import { ProductsContext } from "../context/ProductsContext";
-import ProductSearch from "../components/SearchProducts";
+import ProductSearch from "../components/ProductSearch";
 import { IItem } from "../interfaces/interfaces";
-import { UserContext } from "../context/UserContext";
+import InfiniteScroll from "react-infinite-scroll-component";
+import { Typography } from "@mui/material";
+import LoadingSpinner from "../components/LoadingSpinner";
+import ProductsGrid from "../components/ProductsGrid";
 
-const ProductsPage: React.FC = () => {
-  const productsContext = useContext(ProductsContext);
-  const userContext = useContext(UserContext);
-  const { products } = productsContext;
+const ProductsPage: FC = () => {
+  const { products } = useContext(ProductsContext);
   const [filteredProducts, setFilteredProducts] = useState<IItem[]>([]);
+  const [displayedProducts, setDisplayedProducts] = useState<IItem[]>([]);
+  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [isPending, startTransition] = useTransition();
 
-  const { addToCart } = userContext;
+  const itemsPerPage: number = 20;
+
+  useEffect(() => {
+    startTransition(() => {
+      setFilteredProducts(products);
+      setDisplayedProducts(products.slice(0, itemsPerPage));
+    });
+  }, [products]);
 
   const handleSearch = useCallback(
     (query: string) => {
-      const filtered = products.filter((product) =>
-        product.name.toLowerCase().includes(query.toLowerCase())
-      );
-      setFilteredProducts(filtered);
+      startTransition(() => {
+        const filtered = products.filter((product) =>
+          product.name.toLowerCase().includes(query.toLowerCase())
+        );
+        setFilteredProducts(filtered);
+        setDisplayedProducts(filtered.slice(0, itemsPerPage));
+        setHasMore(filtered.length > itemsPerPage);
+      });
     },
     [products]
   );
+
+  const fetchMoreData = () => {
+    if (displayedProducts.length >= filteredProducts.length) {
+      setHasMore(false);
+      return;
+    }
+    startTransition(() => {
+      const nextProducts: IItem[] = filteredProducts.slice(
+        displayedProducts.length,
+        displayedProducts.length + itemsPerPage
+      );
+      setDisplayedProducts([...displayedProducts, ...nextProducts]);
+    });
+  };
 
   return (
     <>
@@ -37,41 +64,23 @@ const ProductsPage: React.FC = () => {
         Products
       </Typography>
       <ProductSearch onSearch={handleSearch} />
-      <Grid container spacing={4}>
-        {filteredProducts.map((product) => (
-          <Grid item key={product.id} xs={12} sm={6} md={4}>
-            <Card
-              sx={{ height: "100%", display: "flex", flexDirection: "column" }}
-            >
-              <CardContent sx={{ flex: 1 }}>
-                <Typography
-                  variant="h6"
-                  component="h6"
-                  className="typography-ellipsis-1"
-                >
-                  {product.name}
-                </Typography>
-                <Divider />
-                <Typography component="p" className="typography-ellipsis-2">
-                  {product.description}
-                </Typography>
-                <Typography color="textSecondary">
-                  $ {product.price.toFixed(2)}
-                </Typography>
-              </CardContent>
-              <CardActions>
-                <Button
-                  size="small"
-                  color="secondary"
-                  onClick={() => addToCart(product)}
-                >
-                  Add do Cart
-                </Button>
-              </CardActions>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+      {isPending && displayedProducts.length === 0 ? (
+        <LoadingSpinner />
+      ) : (
+        <InfiniteScroll
+          dataLength={displayedProducts.length}
+          next={fetchMoreData}
+          hasMore={hasMore}
+          loader={(<LoadingSpinner />)}
+          endMessage={
+            <Typography variant="h6" align="center" color="textSecondary">
+              No more products
+            </Typography>
+          }
+        >
+          <ProductsGrid products={displayedProducts} />
+        </InfiniteScroll>
+      )}
     </>
   );
 };
