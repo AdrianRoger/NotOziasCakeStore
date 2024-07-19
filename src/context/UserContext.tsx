@@ -60,10 +60,10 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
   const [userList, setUserList] = useState<IUser[]>([
     {
       id: 1,
-      name: "Adrian",
+      name: "Admin",
       username: "admin",
       password: "admin",
-      balance: 789,
+      balance: 1000,
       cart: [],
     },
   ]);
