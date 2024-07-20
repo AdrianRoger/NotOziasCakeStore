@@ -117,7 +117,7 @@ const CartPage: React.FC = () => {
             color="secondary"
             onClick={() => purchase(Number(totalPrice))}
           >
-            chekout
+            checkout
           </Button>
           <Modal open={modalOpen} handleClose={handleClose} title="Purchase">
             {successPurchase ? (
